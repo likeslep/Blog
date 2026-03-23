@@ -6,6 +6,7 @@ import (
 	"blog/dao"
 	"blog/models"
 	"blog/service"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,7 +40,19 @@ func SetupRouter() *gin.Engine {
 		{
 			posts.GET("", postController.ListPosts)
 			posts.GET("/:id", postController.GetPost)
-			posts.POST("", postController.Create) // TODO: 添加JWT中间件
+		}
+
+		// 需要认证的路由（后续添加JWT中间件）
+		authRequired := api.Group("")
+		// TODO: authRequired.Use(middleware.JWTAuth())
+		{
+			// 用户相关（需要认证）
+			authRequired.GET("/profile", userController.GetProfile)
+
+			// 文章管理（需要认证）
+			authRequired.POST("/posts", postController.Create)           // 创建文章
+			authRequired.PUT("/posts/:id", postController.UpdatePost)    // 更新文章
+			authRequired.DELETE("/posts/:id", postController.DeletePost) // 删除文章
 		}
 	}
 

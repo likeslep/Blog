@@ -7,6 +7,6 @@ database:
   host: localhost
   port: 3306
   username: root
-  password: yourpassword
+  password: root
   database: blog
   charset: utf8mb4

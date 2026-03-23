@@ -4,8 +4,7 @@ package service
 import (
 	"blog/dao"
 	"blog/models"
-	"errors"
-	"golang.org/x/crypto/bcrypt"
+	"blog/utils"
 )
 
 type UserService struct {
@@ -18,49 +17,69 @@ func NewUserService(userDAO *dao.UserDAO) *UserService {
 
 func (s *UserService) Register(username, email, password string) (*models.User, error) {
 	// 检查用户名是否存在
-	existingUser, _ := s.userDAO.GetByUsername(username)
-	if existingUser != nil {
-		return nil, errors.New("用户名已存在")
+	exists, err := s.userDAO.IsUsernameExists(username)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, utils.ErrUserAlreadyExists
 	}
 
 	// 检查邮箱是否存在
-	existingEmail, _ := s.userDAO.GetByEmail(email)
-	if existingEmail != nil {
-		return nil, errors.New("邮箱已被注册")
+	exists, err = s.userDAO.IsEmailExists(email)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		return nil, utils.ErrEmailAlreadyExists
 	}
 
 	// 加密密码
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
-		return nil, err
+		return nil, utils.WrapError(utils.ErrInternalServer, "密码加密失败")
 	}
 
 	user := &models.User{
 		Username: username,
 		Email:    email,
-		Password: string(hashedPassword),
+		Password: hashedPassword,
 		Role:     "user",
 		Status:   1,
 	}
 
 	err = s.userDAO.Create(user)
-	return user, err
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *UserService) Login(username, password string) (*models.User, error) {
 	user, err := s.userDAO.GetByUsername(username)
 	if err != nil {
-		return nil, errors.New("用户名或密码错误")
+		if err == utils.ErrUserNotFound {
+			return nil, utils.ErrInvalidPassword
+		}
+		return nil, err
 	}
 
 	if user.Status != 1 {
-		return nil, errors.New("账户已被禁用")
+		return nil, utils.ErrUserDisabled
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		return nil, errors.New("用户名或密码错误")
+	if !utils.CheckPasswordHash(password, user.Password) {
+		return nil, utils.ErrInvalidPassword
 	}
 
 	return user, nil
+}
+
+func (s *UserService) GetUserByID(id uint) (*models.User, error) {
+	return s.userDAO.GetByID(id)
+}
+
+func (s *UserService) UpdateUser(user *models.User) error {
+	return s.userDAO.Update(user)
 }

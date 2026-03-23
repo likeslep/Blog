@@ -3,8 +3,8 @@ package controller
 
 import (
 	"blog/service"
+	"blog/utils"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"strconv"
 )
 
@@ -17,16 +17,22 @@ func NewPostController(postService *service.PostService) *PostController {
 }
 
 type CreatePostRequest struct {
-	Title      string   `json:"title" binding:"required"`
+	Title      string   `json:"title" binding:"required,min=1,max=200"`
 	Content    string   `json:"content" binding:"required"`
 	CategoryID uint     `json:"category_id"`
 	Tags       []string `json:"tags"`
 }
 
+type UpdatePostRequest struct {
+	Title      string `json:"title" binding:"required,min=1,max=200"`
+	Content    string `json:"content" binding:"required"`
+	CategoryID uint   `json:"category_id"`
+}
+
 func (ctrl *PostController) Create(c *gin.Context) {
 	var req CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.ValidationError(c, "参数验证失败: "+err.Error())
 		return
 	}
 
@@ -35,32 +41,65 @@ func (ctrl *PostController) Create(c *gin.Context) {
 
 	post, err := ctrl.postService.Create(req.Title, req.Content, userID, req.CategoryID, req.Tags)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.Error(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "文章创建成功",
-		"post":    post,
-	})
+	utils.SuccessWithMessage(c, "文章创建成功", post)
 }
 
 func (ctrl *PostController) GetPost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "无效的文章ID"})
+		utils.ValidationError(c, "无效的文章ID")
 		return
 	}
 
 	post, err := ctrl.postService.GetPostByID(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "文章不存在"})
+		utils.Error(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"post": post,
-	})
+	utils.Success(c, post)
+}
+
+func (ctrl *PostController) UpdatePost(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		utils.ValidationError(c, "无效的文章ID")
+		return
+	}
+
+	var req UpdatePostRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ValidationError(c, "参数验证失败: "+err.Error())
+		return
+	}
+
+	err = ctrl.postService.UpdatePost(uint(id), req.Title, req.Content, req.CategoryID)
+	if err != nil {
+		utils.Error(c, err)
+		return
+	}
+
+	utils.SuccessWithMessage(c, "文章更新成功", nil)
+}
+
+func (ctrl *PostController) DeletePost(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		utils.ValidationError(c, "无效的文章ID")
+		return
+	}
+
+	err = ctrl.postService.DeletePost(uint(id))
+	if err != nil {
+		utils.Error(c, err)
+		return
+	}
+
+	utils.SuccessWithMessage(c, "文章删除成功", nil)
 }
 
 func (ctrl *PostController) ListPosts(c *gin.Context) {
@@ -71,14 +110,15 @@ func (ctrl *PostController) ListPosts(c *gin.Context) {
 
 	posts, total, err := ctrl.postService.ListPosts(page, pageSize, status, uint(categoryID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.Error(c, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data":  posts,
-		"total": total,
-		"page":  page,
-		"size":  pageSize,
+	utils.Success(c, gin.H{
+		"list":        posts,
+		"total":       total,
+		"page":        page,
+		"page_size":   pageSize,
+		"total_pages": (total + int64(pageSize) - 1) / int64(pageSize),
 	})
 }
