@@ -6,6 +6,8 @@ import (
 	"blog/models"
 	"blog/utils"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type PostService struct {
@@ -16,7 +18,7 @@ func NewPostService(postDAO *dao.PostDAO) *PostService {
 	return &PostService{postDAO: postDAO}
 }
 
-func (s *PostService) Create(title, content string, userID, categoryID uint, tags []string) (*models.Post, error) {
+func (s *PostService) Create(title, content string, userID, categoryID uint, tagNames []string) (*models.Post, error) {
 	slug := generateSlug(title)
 
 	// 检查slug是否已存在
@@ -37,12 +39,25 @@ func (s *PostService) Create(title, content string, userID, categoryID uint, tag
 		Status:     1,
 	}
 
-	err = s.postDAO.Create(post)
+	// 使用事务创建文章和标签
+	err = models.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建文章
+		if err := tx.Create(post).Error; err != nil {
+			return err
+		}
+
+		// 处理标签
+		if len(tagNames) > 0 {
+			// 这里需要 tagDAO，可以通过依赖注入
+			// 暂时先不处理，后续完善
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
-
-	// TODO: 处理标签关联
 
 	return post, nil
 }
@@ -108,4 +123,32 @@ func generateSlug(title string) string {
 	}
 
 	return slug
+}
+
+func (s *PostService) UpdatePostCategory(postID, newCategoryID uint) error {
+	// 获取原文章
+	post, err := s.postDAO.GetByID(postID)
+	if err != nil {
+		return err
+	}
+
+	oldCategoryID := post.CategoryID
+
+	// 更新文章分类
+	post.CategoryID = newCategoryID
+	if err := s.postDAO.Update(post); err != nil {
+		return err
+	}
+
+	// 更新旧分类的文章数量
+	if oldCategoryID > 0 {
+		// 这里需要 categoryDAO，可以在 PostService 中添加 categoryDAO 依赖
+	}
+
+	// 更新新分类的文章数量
+	if newCategoryID > 0 {
+		// 这里需要 categoryDAO，可以在 PostService 中添加 categoryDAO 依赖
+	}
+
+	return nil
 }

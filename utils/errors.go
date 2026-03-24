@@ -27,6 +27,7 @@ var (
 	// 分类相关错误
 	ErrCategoryNotFound = errors.New("分类不存在")
 	ErrCategoryExists   = errors.New("分类已存在")
+	ErrCategoryHasPosts = errors.New("该分类下还有文章，无法删除")
 
 	// 标签相关错误
 	ErrTagNotFound = errors.New("标签不存在")
@@ -34,6 +35,13 @@ var (
 
 	// 评论相关错误
 	ErrCommentNotFound = errors.New("评论不存在")
+
+	// JWT 相关错误
+	ErrTokenNotFound          = errors.New("未提供认证令牌")
+	ErrInvalidToken           = errors.New("无效的认证令牌")
+	ErrTokenExpired           = errors.New("认证令牌已过期")
+	ErrTokenNotExpired        = errors.New("令牌未过期，无需刷新")
+	ErrInsufficientPermission = errors.New("权限不足")
 )
 
 // 错误响应结构

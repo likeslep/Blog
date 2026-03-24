@@ -19,7 +19,13 @@ func main() {
 	models.InitDB(cfg)
 
 	// 设置路由
-	r := router.SetupRouter()
+	r := router.SetupRouter(cfg)
+
+	// 打印所有路由（调试用）
+	log.Println("Registered routes:")
+	for _, route := range r.Routes() {
+		log.Printf("  %-6s %s", route.Method, route.Path)
+	}
 
 	// 启动服务器
 	log.Printf("Server is running on http://localhost:%s", cfg.Server.Port)

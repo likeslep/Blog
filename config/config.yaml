@@ -10,3 +10,9 @@ database:
   password: root
   database: blog
   charset: utf8mb4
+
+
+jwt:
+  secret: wozhishixiangshiyishixiwangnengchenggong
+  expire_hour: 24
+  issuer: blog-system

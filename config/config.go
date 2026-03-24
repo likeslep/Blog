@@ -8,6 +8,7 @@ import (
 type Config struct {
 	Server   ServerConfig   `mapstructure:"server"`
 	Database DatabaseConfig `mapstructure:"database"`
+	JWT      JWTConfig      `mapstructure:"jwt"`
 }
 
 type ServerConfig struct {
@@ -22,6 +23,12 @@ type DatabaseConfig struct {
 	Password string `mapstructure:"password"`
 	Database string `mapstructure:"database"`
 	Charset  string `mapstructure:"charset"`
+}
+
+type JWTConfig struct {
+	Secret     string `mapstructure:"secret"`
+	ExpireHour int    `mapstructure:"expire_hour"`
+	Issuer     string `mapstructure:"issuer"`
 }
 
 var GlobalConfig *Config

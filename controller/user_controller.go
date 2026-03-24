@@ -2,8 +2,10 @@
 package controller
 
 import (
+	"blog/middleware"
 	"blog/service"
 	"blog/utils"
+	"errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,6 +28,10 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type RefreshTokenRequest struct {
+	Token string `json:"token" binding:"required"`
+}
+
 func (ctrl *UserController) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -39,16 +45,20 @@ func (ctrl *UserController) Register(c *gin.Context) {
 		return
 	}
 
-	user, err := ctrl.userService.Register(req.Username, req.Email, req.Password)
+	user, token, err := ctrl.userService.Register(req.Username, req.Email, req.Password)
 	if err != nil {
 		utils.Error(c, err)
 		return
 	}
 
 	utils.SuccessWithMessage(c, "注册成功", gin.H{
-		"id":       user.ID,
-		"username": user.Username,
-		"email":    user.Email,
+		"token": token,
+		"user": gin.H{
+			"id":       user.ID,
+			"username": user.Username,
+			"email":    user.Email,
+			"role":     user.Role,
+		},
 	})
 }
 
@@ -59,14 +69,11 @@ func (ctrl *UserController) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := ctrl.userService.Login(req.Username, req.Password)
+	user, token, err := ctrl.userService.Login(req.Username, req.Password)
 	if err != nil {
 		utils.Error(c, err)
 		return
 	}
-
-	// TODO: 生成JWT token
-	token := "temp_token" // 临时token
 
 	utils.SuccessWithMessage(c, "登录成功", gin.H{
 		"token": token,
@@ -79,9 +86,30 @@ func (ctrl *UserController) Login(c *gin.Context) {
 	})
 }
 
+func (ctrl *UserController) RefreshToken(c *gin.Context) {
+	var req RefreshTokenRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ValidationError(c, "参数验证失败: "+err.Error())
+		return
+	}
+
+	newToken, err := ctrl.userService.RefreshToken(req.Token)
+	if err != nil {
+		utils.Error(c, err)
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"token": newToken,
+	})
+}
+
 func (ctrl *UserController) GetProfile(c *gin.Context) {
-	// TODO: 从JWT中获取用户ID
-	userID := uint(1) // 临时写死
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		utils.Error(c, errors.New("没有从context中找到userID"))
+		return
+	}
 
 	user, err := ctrl.userService.GetUserByID(userID)
 	if err != nil {
@@ -90,11 +118,12 @@ func (ctrl *UserController) GetProfile(c *gin.Context) {
 	}
 
 	utils.Success(c, gin.H{
-		"id":       user.ID,
-		"username": user.Username,
-		"email":    user.Email,
-		"avatar":   user.Avatar,
-		"bio":      user.Bio,
-		"role":     user.Role,
+		"id":         user.ID,
+		"username":   user.Username,
+		"email":      user.Email,
+		"avatar":     user.Avatar,
+		"bio":        user.Bio,
+		"role":       user.Role,
+		"created_at": user.CreatedAt,
 	})
 }
