@@ -10,6 +10,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// SwaggerPostResponse 文章响应（用于 Swagger 文档）
+type SwaggerPostResponse struct {
+	ID           uint                     `json:"id" example:"1"`
+	Title        string                   `json:"title" example:"Go语言入门"`
+	Slug         string                   `json:"slug" example:"go-language-intro"`
+	Summary      string                   `json:"summary" example:"文章摘要"`
+	Content      string                   `json:"content" example:"# 标题\n\n内容..."`
+	CoverImage   string                   `json:"cover_image" example:"https://example.com/cover.jpg"`
+	ViewCount    int                      `json:"view_count" example:"100"`
+	LikeCount    int                      `json:"like_count" example:"10"`
+	CommentCount int                      `json:"comment_count" example:"5"`
+	Status       int                      `json:"status" example:"1"`
+	IsTop        bool                     `json:"is_top" example:"false"`
+	UserID       uint                     `json:"user_id" example:"1"`
+	CategoryID   uint                     `json:"category_id" example:"1"`
+	User         *SwaggerUserResponse     `json:"user,omitempty"`
+	Category     *SwaggerCategoryResponse `json:"category,omitempty"`
+	Tags         []SwaggerTagResponse     `json:"tags,omitempty"`
+	CreatedAt    string                   `json:"created_at" example:"2024-01-01T00:00:00Z"`
+	UpdatedAt    string                   `json:"updated_at" example:"2024-01-01T00:00:00Z"`
+}
+
+// SwaggerPostListData 文章列表响应（用于 Swagger 文档）
+type SwaggerPostListData struct {
+	List       []SwaggerPostResponse `json:"list"`
+	Total      int64                 `json:"total" example:"100"`
+	Page       int                   `json:"page" example:"1"`
+	PageSize   int                   `json:"page_size" example:"10"`
+	TotalPages int64                 `json:"total_pages" example:"10"`
+}
+
+// SwaggerTagListData 标签列表响应（用于 Swagger 文档）
+type SwaggerTagListData struct {
+	List       []SwaggerTagResponse `json:"list"`
+	Total      int64                `json:"total" example:"100"`
+	Page       int                  `json:"page" example:"1"`
+	PageSize   int                  `json:"page_size" example:"10"`
+	TotalPages int64                `json:"total_pages" example:"10"`
+}
+
 type PostController struct {
 	postService *service.PostService
 }
@@ -33,6 +73,17 @@ type UpdatePostRequest struct {
 }
 
 // Create 创建文章
+// @Summary      创建文章
+// @Description  创建新文章（需要认证）
+// @Tags         文章管理
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body CreatePostRequest true "文章信息"
+// @Success      200  {object}  utils.Response{data=SwaggerPostResponse} "创建成功"
+// @Failure      400  {object}  utils.Response "参数错误"
+// @Failure      401  {object}  utils.Response "未授权"
+// @Router       /posts [post]
 func (ctrl *PostController) Create(c *gin.Context) {
 	var req CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -56,7 +107,16 @@ func (ctrl *PostController) Create(c *gin.Context) {
 	utils.SuccessWithMessage(c, "文章创建成功", post)
 }
 
-// GetPost 获取文章详情（公开）
+// GetPost 获取文章详情
+// @Summary      获取文章详情
+// @Description  根据ID获取文章详情
+// @Tags         文章管理
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "文章ID"
+// @Success      200  {object}  utils.Response{data=SwaggerPostResponse} "获取成功"
+// @Failure      404  {object}  utils.Response "文章不存在"
+// @Router       /posts/{id} [get]
 func (ctrl *PostController) GetPost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -74,6 +134,20 @@ func (ctrl *PostController) GetPost(c *gin.Context) {
 }
 
 // UpdatePost 更新文章
+// @Summary      更新文章
+// @Description  更新文章内容（需要认证，仅作者或管理员）
+// @Tags         文章管理
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path int true "文章ID"
+// @Param        request body UpdatePostRequest true "文章信息"
+// @Success      200  {object}  utils.Response{data=SwaggerPostResponse} "更新成功"
+// @Failure      400  {object}  utils.Response "参数错误"
+// @Failure      401  {object}  utils.Response "未授权"
+// @Failure      403  {object}  utils.Response "权限不足"
+// @Failure      404  {object}  utils.Response "文章不存在"
+// @Router       /posts/{id} [put]
 func (ctrl *PostController) UpdatePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -120,6 +194,18 @@ func (ctrl *PostController) UpdatePost(c *gin.Context) {
 }
 
 // DeletePost 删除文章
+// @Summary      删除文章
+// @Description  删除文章（需要认证，仅作者或管理员）
+// @Tags         文章管理
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id path int true "文章ID"
+// @Success      200  {object}  utils.Response "删除成功"
+// @Failure      401  {object}  utils.Response "未授权"
+// @Failure      403  {object}  utils.Response "权限不足"
+// @Failure      404  {object}  utils.Response "文章不存在"
+// @Router       /posts/{id} [delete]
 func (ctrl *PostController) DeletePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -159,6 +245,17 @@ func (ctrl *PostController) DeletePost(c *gin.Context) {
 }
 
 // ListPosts 获取文章列表
+// @Summary      获取文章列表
+// @Description  分页获取文章列表
+// @Tags         文章管理
+// @Accept       json
+// @Produce      json
+// @Param        page query int false "页码" default(1)
+// @Param        page_size query int false "每页数量" default(10)
+// @Param        status query int false "状态 1:已发布 0:草稿 2:私密" default(1)
+// @Param        category_id query int false "分类ID"
+// @Success      200  {object}  utils.Response{data=SwaggerPostListData} "获取成功"
+// @Router       /posts [get]
 func (ctrl *PostController) ListPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -188,7 +285,18 @@ func (ctrl *PostController) ListPosts(c *gin.Context) {
 	})
 }
 
-// GetPostsByTag 根据标签获取文章列表
+// GetPostsByTag 根据标签获取文章
+// @Summary      根据标签获取文章
+// @Description  通过标签slug获取该标签下的所有文章
+// @Tags         文章管理
+// @Accept       json
+// @Produce      json
+// @Param        slug path string true "标签slug"
+// @Param        page query int false "页码" default(1)
+// @Param        page_size query int false "每页数量" default(10)
+// @Success      200  {object}  utils.Response{data=SwaggerPostListData} "获取成功"
+// @Failure      404  {object}  utils.Response "标签不存在"
+// @Router       /posts/tag/{slug} [get]
 func (ctrl *PostController) GetPostsByTag(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {

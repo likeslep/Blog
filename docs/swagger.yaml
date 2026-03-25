@@ -1,0 +1,1890 @@
+basePath: /api/v1
+definitions:
+  controller.CreateCategoryRequest:
+    properties:
+      description:
+        maxLength: 200
+        type: string
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+      sort_order:
+        type: integer
+    required:
+    - name
+    type: object
+  controller.CreateCommentRequest:
+    properties:
+      content:
+        example: 写得很好！
+        maxLength: 1000
+        minLength: 1
+        type: string
+      parent_id:
+        type: integer
+    required:
+    - content
+    type: object
+  controller.CreatePostRequest:
+    properties:
+      category_id:
+        type: integer
+      content:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        maxLength: 200
+        minLength: 1
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  controller.CreateTagRequest:
+    properties:
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  controller.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  controller.RefreshTokenRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  controller.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        maxLength: 50
+        minLength: 6
+        type: string
+      username:
+        maxLength: 50
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  controller.SwaggerAttachmentListData:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/controller.SwaggerAttachmentResponse'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
+  controller.SwaggerAttachmentResponse:
+    properties:
+      created_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      filename:
+        example: 550e8400-e29b-41d4-a716-446655440000.jpg
+        type: string
+      height:
+        example: 600
+        type: integer
+      id:
+        example: 1
+        type: integer
+      mime_type:
+        example: image/jpeg
+        type: string
+      original_name:
+        example: test.jpg
+        type: string
+      size:
+        example: 102400
+        type: integer
+      thumb_url:
+        example: http://localhost:8080/uploads/2024/01/thumb_test.jpg
+        type: string
+      type:
+        example: image
+        type: string
+      url:
+        example: http://localhost:8080/uploads/2024/01/test.jpg
+        type: string
+      width:
+        example: 800
+        type: integer
+    type: object
+  controller.SwaggerCategoryListData:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/controller.SwaggerCategoryResponse'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
+  controller.SwaggerCategoryResponse:
+    properties:
+      created_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      description:
+        example: 技术相关文章
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 技术
+        type: string
+      post_count:
+        example: 10
+        type: integer
+      slug:
+        example: ji-shu
+        type: string
+      sort_order:
+        example: 1
+        type: integer
+    type: object
+  controller.SwaggerCommentListData:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/controller.SwaggerCommentResponse'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
+  controller.SwaggerCommentResponse:
+    properties:
+      content:
+        example: 写得很好！
+        type: string
+      created_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      like_count:
+        example: 0
+        type: integer
+      parent_id:
+        description: 移除 example 标签
+        type: integer
+      post_id:
+        example: 1
+        type: integer
+      replies:
+        items:
+          $ref: '#/definitions/controller.SwaggerCommentResponse'
+        type: array
+      status:
+        example: 1
+        type: integer
+      user_id:
+        example: 1
+        type: integer
+      username:
+        example: testuser
+        type: string
+    type: object
+  controller.SwaggerLoginData:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/controller.SwaggerUserResponse'
+    type: object
+  controller.SwaggerPostListData:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/controller.SwaggerPostResponse'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
+  controller.SwaggerPostResponse:
+    properties:
+      category:
+        $ref: '#/definitions/controller.SwaggerCategoryResponse'
+      category_id:
+        example: 1
+        type: integer
+      comment_count:
+        example: 5
+        type: integer
+      content:
+        example: |-
+          # 标题
+
+          内容...
+        type: string
+      cover_image:
+        example: https://example.com/cover.jpg
+        type: string
+      created_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_top:
+        example: false
+        type: boolean
+      like_count:
+        example: 10
+        type: integer
+      slug:
+        example: go-language-intro
+        type: string
+      status:
+        example: 1
+        type: integer
+      summary:
+        example: 文章摘要
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/controller.SwaggerTagResponse'
+        type: array
+      title:
+        example: Go语言入门
+        type: string
+      updated_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      user:
+        $ref: '#/definitions/controller.SwaggerUserResponse'
+      user_id:
+        example: 1
+        type: integer
+      view_count:
+        example: 100
+        type: integer
+    type: object
+  controller.SwaggerTagListData:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/controller.SwaggerTagResponse'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      total_pages:
+        example: 10
+        type: integer
+    type: object
+  controller.SwaggerTagResponse:
+    properties:
+      created_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Go
+        type: string
+      post_count:
+        example: 5
+        type: integer
+      slug:
+        example: go
+        type: string
+    type: object
+  controller.SwaggerUserResponse:
+    properties:
+      avatar:
+        example: https://example.com/avatar.jpg
+        type: string
+      bio:
+        example: 个人简介
+        type: string
+      created_at:
+        example: "2024-01-01T00:00:00Z"
+        type: string
+      email:
+        example: test@example.com
+        type: string
+      id:
+        example: 1
+        type: integer
+      role:
+        example: user
+        type: string
+      username:
+        example: testuser
+        type: string
+    type: object
+  controller.UpdateCategoryRequest:
+    properties:
+      description:
+        maxLength: 200
+        type: string
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+      sort_order:
+        type: integer
+    required:
+    - name
+    type: object
+  controller.UpdatePostRequest:
+    properties:
+      category_id:
+        type: integer
+      content:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        maxLength: 200
+        minLength: 1
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  controller.UpdateTagRequest:
+    properties:
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - name
+    type: object
+  utils.Response:
+    properties:
+      code:
+        description: 状态码，0表示成功
+        example: 0
+        type: integer
+      data:
+        description: 响应数据
+      message:
+        description: 响应消息
+        example: success
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: your-email@example.com
+    name: API Support
+  description: 个人博客系统 API 文档
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Blog API
+  version: "1.0"
+paths:
+  /admin/categories:
+    post:
+      consumes:
+      - application/json
+      description: 创建新分类（需要管理员权限）
+      parameters:
+      - description: 分类信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCategoryResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: 分类已存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建分类
+      tags:
+      - 分类管理
+  /admin/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除分类（需要管理员权限，只能删除没有文章的空白分类）
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 分类不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: 分类下还有文章，无法删除
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除分类
+      tags:
+      - 分类管理
+    put:
+      consumes:
+      - application/json
+      description: 更新分类信息（需要管理员权限）
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 分类信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCategoryResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 分类不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: 分类已存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新分类
+      tags:
+      - 分类管理
+  /admin/comments/{cid}/approve:
+    post:
+      consumes:
+      - application/json
+      description: 审核通过待审核的评论（需要管理员权限）
+      parameters:
+      - description: 评论ID
+        in: path
+        name: cid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 审核通过
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 审核通过评论
+      tags:
+      - 评论管理
+  /admin/comments/{cid}/reject:
+    post:
+      consumes:
+      - application/json
+      description: 拒绝待审核的评论（需要管理员权限）
+      parameters:
+      - description: 评论ID
+        in: path
+        name: cid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 已拒绝
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 拒绝评论
+      tags:
+      - 评论管理
+  /admin/comments/pending:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有待审核的评论（需要管理员权限）
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCommentListData'
+              type: object
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取待审核评论
+      tags:
+      - 评论管理
+  /admin/tags:
+    post:
+      consumes:
+      - application/json
+      description: 创建新标签（需要管理员权限）
+      parameters:
+      - description: 标签信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerTagResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: 标签已存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建标签
+      tags:
+      - 标签管理
+  /admin/tags/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除标签（需要管理员权限）
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 标签不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除标签
+      tags:
+      - 标签管理
+    put:
+      consumes:
+      - application/json
+      description: 更新标签信息（需要管理员权限）
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 标签信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UpdateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerTagResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 标签不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: 标签已存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新标签
+      tags:
+      - 标签管理
+  /attachments:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取附件列表（用户只能看到自己的文件）
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      - description: 文件类型 image/file/video
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerAttachmentListData'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: 获取附件列表
+      tags:
+      - 文件管理
+  /attachments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除附件（需要认证，只能删除自己的文件）
+      parameters:
+      - description: 附件ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 附件不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除附件
+      tags:
+      - 文件管理
+    get:
+      consumes:
+      - application/json
+      description: 根据ID获取附件详情
+      parameters:
+      - description: 附件ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerAttachmentResponse'
+              type: object
+        "404":
+          description: 附件不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取附件详情
+      tags:
+      - 文件管理
+  /attachments/my:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的所有附件（需要认证）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/controller.SwaggerAttachmentResponse'
+                  type: array
+              type: object
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取当前用户的附件
+      tags:
+      - 文件管理
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录，返回 JWT token
+      parameters:
+      - description: 登录信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登录成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerLoginData'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 用户名或密码错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 用户登录
+      tags:
+      - 用户认证
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 刷新过期的 JWT token
+      parameters:
+      - description: Token 信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 刷新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    token:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Token 无效或已过期
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 刷新 Token
+      tags:
+      - 用户认证
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: 注册新用户
+      parameters:
+      - description: 注册信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 注册成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerLoginData'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: 用户已存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 用户注册
+      tags:
+      - 用户认证
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取分类列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCategoryListData'
+              type: object
+      summary: 获取分类列表
+      tags:
+      - 分类管理
+  /categories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据ID获取分类详情
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCategoryResponse'
+              type: object
+        "404":
+          description: 分类不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 获取分类详情
+      tags:
+      - 分类管理
+  /categories/all:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有分类（不分页，用于下拉选择）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/controller.SwaggerCategoryResponse'
+                  type: array
+              type: object
+      summary: 获取所有分类
+      tags:
+      - 分类管理
+  /categories/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: 根据Slug获取分类详情
+      parameters:
+      - description: 分类Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCategoryResponse'
+              type: object
+        "404":
+          description: 分类不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 通过Slug获取分类详情
+      tags:
+      - 分类管理
+  /comments/{cid}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除评论（需要认证，仅作者或管理员）
+      parameters:
+      - description: 评论ID
+        in: path
+        name: cid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除评论
+      tags:
+      - 评论管理
+  /comments/{cid}/like:
+    delete:
+      consumes:
+      - application/json
+      description: 取消评论点赞（需要认证）
+      parameters:
+      - description: 评论ID
+        in: path
+        name: cid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 取消点赞成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 取消点赞
+      tags:
+      - 评论管理
+    post:
+      consumes:
+      - application/json
+      description: 给评论点赞（需要认证）
+      parameters:
+      - description: 评论ID
+        in: path
+        name: cid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 点赞成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 评论不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 点赞评论
+      tags:
+      - 评论管理
+  /posts:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取文章列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      - default: 1
+        description: 状态 1:已发布 0:草稿 2:私密
+        in: query
+        name: status
+        type: integer
+      - description: 分类ID
+        in: query
+        name: category_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerPostListData'
+              type: object
+      summary: 获取文章列表
+      tags:
+      - 文章管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新文章（需要认证）
+      parameters:
+      - description: 文章信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerPostResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建文章
+      tags:
+      - 文章管理
+  /posts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除文章（需要认证，仅作者或管理员）
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 文章不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除文章
+      tags:
+      - 文章管理
+    get:
+      consumes:
+      - application/json
+      description: 根据ID获取文章详情
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerPostResponse'
+              type: object
+        "404":
+          description: 文章不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 获取文章详情
+      tags:
+      - 文章管理
+    put:
+      consumes:
+      - application/json
+      description: 更新文章内容（需要认证，仅作者或管理员）
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 文章信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UpdatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerPostResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: 权限不足
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 文章不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新文章
+      tags:
+      - 文章管理
+  /posts/{id}/comments:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定文章的所有评论（树形结构）
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCommentListData'
+              type: object
+      summary: 获取文章评论列表
+      tags:
+      - 评论管理
+    post:
+      consumes:
+      - application/json
+      description: 对文章发表评论或回复（需要认证）
+      parameters:
+      - description: 文章ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 评论内容
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 评论成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCommentResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: 文章不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 发表评论
+      tags:
+      - 评论管理
+  /posts/tag/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: 通过标签slug获取该标签下的所有文章
+      parameters:
+      - description: 标签slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerPostListData'
+              type: object
+        "404":
+          description: 标签不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 根据标签获取文章
+      tags:
+      - 文章管理
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: 获取已登录用户的个人信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerUserResponse'
+              type: object
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取当前用户信息
+      tags:
+      - 用户信息
+  /profile/comments:
+    get:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的所有评论（需要认证）
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerCommentListData'
+              type: object
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取用户评论列表
+      tags:
+      - 评论管理
+  /tags:
+    get:
+      consumes:
+      - application/json
+      description: 分页获取标签列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerTagListData'
+              type: object
+      summary: 获取标签列表
+      tags:
+      - 标签管理
+  /tags/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据ID获取标签详情
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerTagResponse'
+              type: object
+        "404":
+          description: 标签不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 获取标签详情
+      tags:
+      - 标签管理
+  /tags/all:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有标签（不分页，用于下拉选择）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/controller.SwaggerTagResponse'
+                  type: array
+              type: object
+      summary: 获取所有标签
+      tags:
+      - 标签管理
+  /tags/popular:
+    get:
+      consumes:
+      - application/json
+      description: 获取文章数量最多的标签
+      parameters:
+      - default: 10
+        description: 返回数量
+        in: query
+        maximum: 50
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/controller.SwaggerTagResponse'
+                  type: array
+              type: object
+      summary: 获取热门标签
+      tags:
+      - 标签管理
+  /tags/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: 根据Slug获取标签详情
+      parameters:
+      - description: 标签Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerTagResponse'
+              type: object
+        "404":
+          description: 标签不存在
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: 通过Slug获取标签详情
+      tags:
+      - 标签管理
+  /upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传单个文件（图片、文档等）（需要认证）
+      parameters:
+      - description: 要上传的文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 上传成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/controller.SwaggerAttachmentResponse'
+              type: object
+        "400":
+          description: 参数错误或文件过大
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 上传文件
+      tags:
+      - 文件管理
+  /upload/multiple:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 同时上传多个文件（需要认证）
+      parameters:
+      - description: 要上传的文件列表
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 上传成功（部分失败时返回错误列表）
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    errors:
+                      items:
+                        type: string
+                      type: array
+                    success:
+                      items:
+                        $ref: '#/definitions/controller.SwaggerAttachmentResponse'
+                      type: array
+                  type: object
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: 多文件上传
+      tags:
+      - 文件管理
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

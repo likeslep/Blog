@@ -10,6 +10,8 @@ import (
 	"blog/service"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func SetupRouter(cfg *config.Config) *gin.Engine {
@@ -38,6 +40,9 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 	tagController := controller.NewTagController(tagService)
 	commentController := controller.NewCommentController(commentService)
 	attachmentController := controller.NewAttachmentController(attachmentService) // 新增
+
+	// Swagger 文档路由
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// API路由组
 	api := r.Group("/api/v1")
