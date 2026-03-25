@@ -20,18 +20,21 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 	postDAO := dao.NewPostDAO(models.DB)
 	categoryDAO := dao.NewCategoryDAO(models.DB)
 	tagDAO := dao.NewTagDAO(models.DB)
+	commentDAO := dao.NewCommentDAO(models.DB)
 
 	// 初始化Service
 	userService := service.NewUserService(userDAO, cfg)
-	postService := service.NewPostService(postDAO)
+	postService := service.NewPostService(postDAO, tagDAO, categoryDAO, models.DB)
 	categoryService := service.NewCategoryService(categoryDAO)
 	tagService := service.NewTagService(tagDAO)
+	commentService := service.NewCommentService(commentDAO, postDAO, userDAO, models.DB)
 
 	// 初始化Controller
 	userController := controller.NewUserController(userService)
 	postController := controller.NewPostController(postService)
 	categoryController := controller.NewCategoryController(categoryService)
 	tagController := controller.NewTagController(tagService)
+	commentController := controller.NewCommentController(commentService)
 
 	// API路由组
 	api := r.Group("/api/v1")
@@ -59,7 +62,10 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 		{
 			posts.GET("", postController.ListPosts)
 			posts.GET("/:id", postController.GetPost)
+			posts.GET("/tag/:slug", postController.GetPostsByTag)
 		}
+
+		api.GET("/posts/:id/comments", commentController.GetPostComments)
 
 		// 标签公开路由
 		tags := api.Group("/tags")
@@ -77,11 +83,18 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 		{
 			// 用户相关
 			authRequired.GET("/profile", userController.GetProfile)
+			authRequired.GET("/profile/comments", commentController.GetUserComments) // 我的评论
 
 			// 文章管理
 			authRequired.POST("/posts", postController.Create)
 			authRequired.PUT("/posts/:id", postController.UpdatePost)
 			authRequired.DELETE("/posts/:id", postController.DeletePost)
+
+			// 评论操作
+			authRequired.POST("/posts/:id/comments", commentController.CreateComment)   // 发表评论
+			authRequired.DELETE("/comments/:cid", commentController.DeleteComment)      // 删除评论
+			authRequired.POST("/comments/:cid/like", commentController.LikeComment)     // 点赞
+			authRequired.DELETE("/comments/:cid/like", commentController.UnlikeComment) // 取消点赞
 		}
 
 		// 管理员专用路由（可选）
@@ -98,6 +111,11 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			adminRequired.POST("/tags", tagController.Create)
 			adminRequired.PUT("/tags/:id", tagController.Update)
 			adminRequired.DELETE("/tags/:id", tagController.Delete)
+
+			// 评论管理
+			adminRequired.GET("/comments/pending", commentController.GetPendingComments)   // 待审核列表
+			adminRequired.POST("/comments/:cid/approve", commentController.ApproveComment) // 审核通过
+			adminRequired.POST("/comments/:cid/reject", commentController.RejectComment)   // 拒绝
 		}
 	}
 

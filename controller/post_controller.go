@@ -5,7 +5,6 @@ import (
 	"blog/middleware"
 	"blog/service"
 	"blog/utils"
-	"errors"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -27,11 +26,13 @@ type CreatePostRequest struct {
 }
 
 type UpdatePostRequest struct {
-	Title      string `json:"title" binding:"required,min=1,max=200"`
-	Content    string `json:"content" binding:"required"`
-	CategoryID uint   `json:"category_id"`
+	Title      string   `json:"title" binding:"required,min=1,max=200"`
+	Content    string   `json:"content" binding:"required"`
+	CategoryID uint     `json:"category_id"`
+	Tags       []string `json:"tags"`
 }
 
+// Create 创建文章
 func (ctrl *PostController) Create(c *gin.Context) {
 	var req CreatePostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -42,7 +43,7 @@ func (ctrl *PostController) Create(c *gin.Context) {
 	// 从 JWT 中获取当前用户ID
 	userID, ok := middleware.GetUserID(c)
 	if !ok {
-		utils.Error(c, errors.New("从JWT中获取当前用户ID错误"))
+		utils.Error(c, utils.ErrInvalidToken)
 		return
 	}
 
@@ -55,6 +56,7 @@ func (ctrl *PostController) Create(c *gin.Context) {
 	utils.SuccessWithMessage(c, "文章创建成功", post)
 }
 
+// GetPost 获取文章详情（公开）
 func (ctrl *PostController) GetPost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -71,7 +73,7 @@ func (ctrl *PostController) GetPost(c *gin.Context) {
 	utils.Success(c, post)
 }
 
-// UpdatePost 更新文章（需要检查权限）
+// UpdatePost 更新文章
 func (ctrl *PostController) UpdatePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -107,16 +109,17 @@ func (ctrl *PostController) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	err = ctrl.postService.UpdatePost(uint(id), req.Title, req.Content, req.CategoryID)
+	// 更新文章
+	updatedPost, err := ctrl.postService.UpdatePost(uint(id), req.Title, req.Content, req.CategoryID, req.Tags)
 	if err != nil {
 		utils.Error(c, err)
 		return
 	}
 
-	utils.SuccessWithMessage(c, "文章更新成功", nil)
+	utils.SuccessWithMessage(c, "文章更新成功", updatedPost)
 }
 
-// DeletePost 删除文章（需要检查权限）
+// DeletePost 删除文章
 func (ctrl *PostController) DeletePost(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -155,7 +158,7 @@ func (ctrl *PostController) DeletePost(c *gin.Context) {
 	utils.SuccessWithMessage(c, "文章删除成功", nil)
 }
 
-// ListPosts 获取文章列表（公开，但管理员可以看到所有状态）
+// ListPosts 获取文章列表
 func (ctrl *PostController) ListPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -167,7 +170,7 @@ func (ctrl *PostController) ListPosts(c *gin.Context) {
 
 	// 如果不是管理员，只显示已发布的文章
 	if role != "admin" {
-		status = 1 // 强制只显示已发布
+		status = 1
 	}
 
 	posts, total, err := ctrl.postService.ListPosts(page, pageSize, status, uint(categoryID))
@@ -182,5 +185,32 @@ func (ctrl *PostController) ListPosts(c *gin.Context) {
 		"page":        page,
 		"page_size":   pageSize,
 		"total_pages": (total + int64(pageSize) - 1) / int64(pageSize),
+	})
+}
+
+// GetPostsByTag 根据标签获取文章列表
+func (ctrl *PostController) GetPostsByTag(c *gin.Context) {
+	slug := c.Param("slug")
+	if slug == "" {
+		utils.ValidationError(c, "无效的标签Slug")
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+
+	posts, total, err := ctrl.postService.GetPostsByTag(slug, page, pageSize)
+	if err != nil {
+		utils.Error(c, err)
+		return
+	}
+
+	utils.Success(c, gin.H{
+		"list":        posts,
+		"total":       total,
+		"page":        page,
+		"page_size":   pageSize,
+		"total_pages": (total + int64(pageSize) - 1) / int64(pageSize),
+		"tag_slug":    slug,
 	})
 }

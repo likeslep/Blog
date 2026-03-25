@@ -35,6 +35,7 @@ var (
 
 	// 评论相关错误
 	ErrCommentNotFound = errors.New("评论不存在")
+	ErrCommentDisabled = errors.New("评论已被禁用")
 
 	// JWT 相关错误
 	ErrTokenNotFound          = errors.New("未提供认证令牌")

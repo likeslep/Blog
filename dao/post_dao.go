@@ -113,3 +113,13 @@ func (dao *PostDAO) IncrementCommentCount(id uint) error {
 	}
 	return nil
 }
+
+// UpdateCommentCount 更新文章评论数
+func (dao *PostDAO) UpdateCommentCount(postID uint, count int) error {
+	err := dao.db.Model(&models.Post{}).Where("id = ?", postID).
+		Update("comment_count", count).Error
+	if err != nil {
+		return utils.WrapError(utils.ErrInternalServer, "更新评论数失败")
+	}
+	return nil
+}
