@@ -21,6 +21,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 	categoryDAO := dao.NewCategoryDAO(models.DB)
 	tagDAO := dao.NewTagDAO(models.DB)
 	commentDAO := dao.NewCommentDAO(models.DB)
+	attachmentDAO := dao.NewAttachmentDAO(models.DB)
 
 	// 初始化Service
 	userService := service.NewUserService(userDAO, cfg)
@@ -28,6 +29,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 	categoryService := service.NewCategoryService(categoryDAO)
 	tagService := service.NewTagService(tagDAO)
 	commentService := service.NewCommentService(commentDAO, postDAO, userDAO, models.DB)
+	attachmentService := service.NewAttachmentService(attachmentDAO, "./uploads", "http://localhost:8080")
 
 	// 初始化Controller
 	userController := controller.NewUserController(userService)
@@ -35,6 +37,7 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 	categoryController := controller.NewCategoryController(categoryService)
 	tagController := controller.NewTagController(tagService)
 	commentController := controller.NewCommentController(commentService)
+	attachmentController := controller.NewAttachmentController(attachmentService) // 新增
 
 	// API路由组
 	api := r.Group("/api/v1")
@@ -95,6 +98,14 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			authRequired.DELETE("/comments/:cid", commentController.DeleteComment)      // 删除评论
 			authRequired.POST("/comments/:cid/like", commentController.LikeComment)     // 点赞
 			authRequired.DELETE("/comments/:cid/like", commentController.UnlikeComment) // 取消点赞
+
+			// 文件上传
+			authRequired.POST("/upload", attachmentController.Upload)
+			authRequired.POST("/upload/multiple", attachmentController.UploadMultiple)
+			authRequired.DELETE("/attachments/:id", attachmentController.Delete)
+			authRequired.GET("/attachments", attachmentController.List)
+			authRequired.GET("/attachments/my", attachmentController.GetUserAttachments)
+			authRequired.GET("/attachments/:id", attachmentController.GetByID)
 		}
 
 		// 管理员专用路由（可选）
@@ -116,6 +127,9 @@ func SetupRouter(cfg *config.Config) *gin.Engine {
 			adminRequired.GET("/comments/pending", commentController.GetPendingComments)   // 待审核列表
 			adminRequired.POST("/comments/:cid/approve", commentController.ApproveComment) // 审核通过
 			adminRequired.POST("/comments/:cid/reject", commentController.RejectComment)   // 拒绝
+
+			// 管理员可以查看所有附件
+			adminRequired.GET("/attachments/all", attachmentController.List)
 		}
 	}
 

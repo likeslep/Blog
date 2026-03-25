@@ -43,6 +43,12 @@ var (
 	ErrTokenExpired           = errors.New("认证令牌已过期")
 	ErrTokenNotExpired        = errors.New("令牌未过期，无需刷新")
 	ErrInsufficientPermission = errors.New("权限不足")
+
+	// 附件相关错误
+	ErrAttachmentNotFound = errors.New("附件不存在")
+	ErrUploadFailed       = errors.New("上传失败")
+	ErrFileTooLarge       = errors.New("文件过大")
+	ErrFileTypeNotAllowed = errors.New("文件类型不支持")
 )
 
 // 错误响应结构

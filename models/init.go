@@ -31,6 +31,7 @@ func InitDB(cfg *config.Config) {
 		&Tag{},
 		&PostTag{},
 		&Comment{},
+		&Attachment{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
